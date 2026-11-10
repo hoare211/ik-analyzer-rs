@@ -1,0 +1,39 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "ik-analyzer-py"
+version = "1.3.0"   # 必须与 Cargo.toml [workspace.package] version 一致（CI 校验）
+description = "A high-performance Chinese tokenizer in Rust, following the analysis-ik baseline with an opt-in IK Analyzer 2012_u6 parity contract."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "Apache-2.0" }
+authors = [{ name = "ik-analyzer-rs contributors" }]
+keywords = ["tokenizer", "chinese", "segmentation", "nlp", "ik-analyzer", "rust"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Text Processing :: Linguistic",
+    "Typing :: Typed",
+    "License :: OSI Approved :: Apache Software License",
+]
+
+[project.urls]
+Homepage = "https://github.com/hoare211/ik-analyzer-rs"
+Repository = "https://github.com/hoare211/ik-analyzer-rs"
+Issues = "https://github.com/hoare211/ik-analyzer-rs/issues"
+Changelog = "https://github.com/hoare211/ik-analyzer-rs/blob/main/CHANGELOG.md"
+Documentation = "https://docs.rs/ik-analyzer-rs"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]

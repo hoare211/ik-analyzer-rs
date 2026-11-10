@@ -1,0 +1,24 @@
+/target
+.idea/
+output.txt
+
+# 临时/历史文件
+1007.txt
+bash_cmd.history
+
+# A/B 对拍工装的生成物（源脚本与探针输入纳入版本控制，产物不入库）
+testing/ab/gen/
+
+# Python / 构建产物
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+python/*.so
+python/dist/
+.pytest_cache/
+.mypy_cache/
+
+# 编辑器 / 系统
+.DS_Store
+*.swp

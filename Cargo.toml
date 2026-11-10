@@ -1,0 +1,82 @@
+[workspace]
+members = [
+    ".",       # 代表根目录下的 crate (my-ik-rs)
+    "python",  # 代表 python/ 目录下的 crate
+]
+
+# 版本单一源（评审 P3-1）：此前根 crate 1.1.2 而 python crate 停在 1.1.1，
+# 导致 `ik_analyzer.__version__` 报的是 python crate 的版本、与实际链接的核心库
+# 不符，且两处安装文档也写成旧版。现统一由 workspace 声明，各 crate 继承。
+# `python/pyproject.toml` 的 version 仍需单独同步（maturin 要求），
+# 由 CI 的 `versions-consistent` job 校验。
+[workspace.package]
+version = "1.3.0"
+edition = "2024"
+rust-version = "1.85"
+
+[package]
+name = "ik-analyzer-rs"
+version.workspace = true
+edition.workspace = true
+# 必须显式继承：仅在 [workspace.package] 声明不足以让本 crate 带上 MSRV。
+# 丢失 MSRV 会让 clippy 失去版本门禁，重新触发 let-chain 建议等新版 lint（评审 P3-1）。
+rust-version.workspace = true
+# edition = "2024" 需要 Rust ≥ 1.85；MSRV 已在 [workspace.package] 统一声明（评审 P4-1）。
+authors = ["ik-analyzer-rs contributors"]
+description = "A high-performance, thread-safe Rust Chinese tokenizer built on the analysis-ik baseline, with an explicit opt-in IK Analyzer 2012_u6 parity contract."
+readme = "README.en.md"
+repository = "https://github.com/hoare211/ik-analyzer-rs"
+homepage = "https://github.com/hoare211/ik-analyzer-rs"
+documentation = "https://docs.rs/ik-analyzer-rs"
+license = "Apache-2.0"
+keywords = ["tokenizer", "segmentation", "nlp", "chinese", "ik"]
+categories = ["text-processing", "internationalization"]
+# 发布的 .crate 是源码分发包：以下目录对 crate 消费者无用。
+# 注意：testing/parity 必须保留——tests/parity_goldens.rs 用 include_str! 编译期引用，
+# 排除后从 .crate 解包将无法 cargo test。
+exclude = [
+    "/.github",
+    "/docs",
+    "/testing/ab", # Java A/B 对拍工装；复算请用仓库而非 .crate
+]
+
+[lib]
+name = "ik_analyzer" # Rust 内部使用的库名
+path = "src/lib.rs"
+
+[dependencies]
+bitflags = "2.13.1"
+log = "0.4.33"
+# `env_logger` 仅 CLI bin 用一次，改为 optional，避免污染所有下游 crate 的编译
+# 与传递依赖（评审 P1-7）。bin 通过 `--features env_logger` 启用日志后端。
+env_logger = { version = "0.11.11", optional = true }
+
+# 在您的 [dev-dependencies] 中，可以为 main.rs 和 tests 添加日志后端
+[dev-dependencies]
+tempfile = "3.27.0"
+criterion = "0.8.2"
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+
+# 实验性探针（已删除）：`probe-count` / `probe-mimalloc` 此前为纯死 Feature，
+# 全仓无任何 `#[global_allocator]` 或计数实现，`probe-mimalloc` 还会白白把
+# `better_mimalloc_rs` 拉进 Cargo.lock。评审 P1-8。
+[features]
+# 默认即走链模型重写 judge_fast 作为正式生产裁决（阶段 1 合入后开启）。
+# 差分验证已在 10⁵ 随机 + 4×10⁶ 重压 + corpus 全量 + 流式/多配置/并发加压轮中 0 分歧，
+# 故默认启用。`--no-default-features` 时回落 judge_reference（与启用前行为一致），
+# 仍可供紧急回退或离线对拍。
+default = ["judge-fast"]
+# judge-verify：保留 judge_reference 并与 judge_fast 双跑逐位 assert（差分测试默认即在
+# test 下编译，无需开启）。仅验证用，有双跑耗时，不进默认。
+judge-verify = []
+# judge-fast：启用链模型重写 judge_fast 作为正式默认裁决。
+judge-fast = []
+# 启用 CLI 的 env_logger 日志后端（仅 `ik-analyzer` bin 需要）。
+env_logger = ["dep:env_logger"]
+
+[[bench]]
+name = "ik_benchmark" # 这是你的基准测试文件的名称 (benches/ik_benchmark.rs)
+harness = false      # 这是解决问题的关键！

@@ -1,0 +1,72 @@
+name: 缺陷报告
+description: 报告分词结果异常、崩溃或其他不正确行为
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提交前请先搜索已有 Issue。安全问题请勿公开提交，按 [SECURITY.md](../SECURITY.md) 私下报告。
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 问题描述
+      description: 实际发生了什么？期望是什么？
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+      description: 最小可复现代码或命令（Rust / Python / CLI 任选）
+      render: rust
+      placeholder: |
+        let factory = TokenizerFactory::new(Config::builder().build());
+        let words: Vec<_> = factory.segmenter("测试文本").map(|l| l.text().to_string()).collect();
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: 涉及组件
+      options:
+        - Rust crate
+        - Python 绑定
+        - CLI
+        - 词典 / 配置
+        - 文档
+        - 其他
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      description: crate 或 wheel 版本，或 commit hash
+      placeholder: "1.3.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境
+      description: OS、rustc / Python 版本、feature 组合
+      placeholder: |
+        OS: Ubuntu 24.04
+        rustc: 1.85.0
+        features: default (judge-fast)
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志 / 崩溃输出
+      description: 如有 panic backtrace、错误信息或对比输出请贴在此处
+      render: shell
+    validations:
+      required: false

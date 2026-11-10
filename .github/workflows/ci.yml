@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  fmt:
+    name: rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - run: cargo fmt --all -- --check
+
+  clippy:
+    name: clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      # -D warnings 让所有 clippy 警告变为失败（评审 P2 工程化）
+      # 注：clippy 依 `rust-version` 做MSRV 门禁，故该字段必须真正继承到每个
+      # crate（`rust-version.workspace = true`），否则会重新触发 let-chain 类
+      # 新版 lint 而使本job 失败（评审 P3-1踩坑）。
+      # 必须显式 `--workspace`：本 workspace 含根 package，cargo 的默认成员只有
+      # 根 crate，不带 `--workspace` 时 `python/`（cdylib，无 job 编译它）根本不进
+      # 构建计划 —— 绑定层的 lint 长期静默失效（`Ok(PyList::new(..)?)` 一类
+      # needless_question_mark 由此漏网，见评审 N-1 的收尾）。
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+
+  test:
+    name: test (default features)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --all
+
+  no-default-features:
+    name: test (no-default-features, judge_reference 回落路径)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      # 验证 judge-fast 回落到 judge_reference 的路径不被腐化（评审 P2）
+      # 评审 P4-9：原先只 build 不 test，改为同时跑 lib 测试
+      - run: cargo build --no-default-features
+      - run: cargo test --no-default-features --lib
+
+  msrv:
+    name: MSRV 1.85
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.85.0
+      # 评审 P4-9：补上默认 feature 与测试，避免只验证回落路径
+      - run: cargo build --no-default-features
+      - run: cargo build
+      - run: cargo test --no-default-features --lib
+
+  doc:
+    name: rustdoc（公共 API 文档与 intra-doc link）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      # 评审 P4-9：新增。`segment_spans` / `Span` / `take_error` 等新增公共 API
+      # 带有 [`crate::…`] 形式的 intra-doc link，坏链会直接让文档构建失败。
+      - run: cargo doc --no-deps
+      - run: RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
+
+  package:
+    name: package（发布产物完整性）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      # 评审 P4-9：新增。词典经 `include_str!` 内嵌，必须确认打包后 dict/ 仍在，
+      # 否则 crates.io 上的 crate 会在编译期找不到词典文件而无法构建。
+      - run: cargo package --list -p ik-analyzer-rs | tee /tmp/pkglist
+      - name: 断言词典文件已包含在包内
+        run: |
+          grep -q '^dict/main2012.dic$' /tmp/pkglist
+          grep -q '^dict/ext_dict/ext.dic$' /tmp/pkglist
+          grep -q '^dict/ext_stop_word/stop.dic$' /tmp/pkglist
+          grep -q '^dict/quantifier.dic$' /tmp/pkglist
+
+  versions-consistent:
+    name: 版本号一致性
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # 评审 P3-1/P4-9：版本曾出现根 crate 1.1.2 而 python crate 1.1.1 的漂移，
+      # 导致 Python 侧 `__version__` 报旧版。现版本统一由 [workspace.package]
+      # 声明，此job 校验三处（Cargo.toml 各 crate / pyproject）确实一致。
+      - name: 读取各来源版本并比对
+        run: |
+          set -euo pipefail
+          ws_ver=$(sed -n '/^\[workspace\.package\]/,/^\[/p' Cargo.toml \
+                    | sed -n 's/^version = "\(.*\)"/\1/p' | head -1)
+          core_ver=$(cargo metadata --no-deps --format-version 1 \
+                      | python3 -c 'import json,sys;print([p["version"] for p in json.load(sys.stdin)["packages"] if p["name"]=="ik-analyzer-rs"][0])')
+          py_ver=$(cargo metadata --no-deps --format-version 1 \
+                    | python3 -c 'import json,sys;print([p["version"] for p in json.load(sys.stdin)["packages"] if p["name"]=="ik-analyzer-py"][0])')
+          pyproject_ver=$(sed -n 's/^version = "\([^"]*\)".*/\1/p' python/pyproject.toml | head -1)
+          echo "workspace.package = $ws_ver"
+          echo "ik-analyzer-rs    = $core_ver"
+          echo "ik-analyzer-py    = $py_ver"
+          echo "pyproject.toml    = $pyproject_ver"
+          test -n "$ws_ver"
+          test "$ws_ver" = "$core_ver"
+          test "$ws_ver" = "$py_ver"
+          test "$ws_ver" = "$pyproject_ver"

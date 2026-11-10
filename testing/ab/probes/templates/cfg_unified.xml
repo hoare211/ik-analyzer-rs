@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment>C1: 与 u6 工装口径逐字节相同的词典（隔离算法差异）</comment>
+    <entry key="ext_dict">long_word_dict.dic</entry>
+    <entry key="ext_stopwords">test_stopwords.dic</entry>
+</properties>

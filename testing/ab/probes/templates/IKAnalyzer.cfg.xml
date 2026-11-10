@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment>IK Analyzer 扩展配置</comment>
+
+    <!--
+     用户可以在这里配置自己的扩展字典
+     使用分号 ; 来分隔多个词典文件
+     路径是相对于 classpath 根目录的
+    -->
+    <entry key="ext_dict">long_word_dict.dic</entry>
+
+    <!--用户可以在这里配置自己的扩展停止词字典-->
+    <entry key="ext_stopwords">test_stopwords.dic</entry>
+
+</properties>

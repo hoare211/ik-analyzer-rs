@@ -1,0 +1,4 @@
+# 词典与测试语料含 CRLF / 非 UTF-8 字节，禁止 Git 做行尾转换，
+# 否则 checkout 后词典内容变化会直接改变分词结果。
+*.dic -text
+*.txt -text

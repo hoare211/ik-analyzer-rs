@@ -1,0 +1,50 @@
+ik-analyzer-rs
+Copyright 2025-2026 ik-analyzer-rs contributors
+
+This product is an independent Rust implementation of Chinese word
+segmentation. It includes material derived from the projects listed below.
+No source files from these projects are vendored in this repository.
+
+--------------------------------------------------------------------------------
+1. IK Analyzer 2012_u6 — algorithm lineage, dictionaries, and optional parity contract
+--------------------------------------------------------------------------------
+Copyright 2012 Lin Liangyi (林良益) / Oolong Studio
+Licensed under the Apache License, Version 2.0.
+Project: https://code.google.com/p/ik-analyzer/
+
+The segmentation algorithms descend from the IK Analyzer family. Compatibility
+with the 2012_u6 behavior is offered as an explicit, opt-in contract
+(Config::u6_parity); default behavior is an independent product decision rather
+than a line-by-line translation of the Java source. The dictionaries under
+dict/ are derived from the IK Analyzer 2012 distribution and have been modified:
+line-ending and whitespace handling were adjusted, one entry was added, and the
+bundled stop-word list was extended with 69 Chinese entries. See CHANGELOG.md
+for the complete list of behavioral changes.
+
+--------------------------------------------------------------------------------
+2. analysis-ik (infinilabs) — implementation baseline
+--------------------------------------------------------------------------------
+Copyright infinilabs and contributors
+Licensed under the Apache License, Version 2.0.
+Project: https://github.com/infinilabs/analysis-ik (master@6d2d70f)
+
+Used as the implementation baseline: its defect fixes relative to 2012_u6 are
+absorbed, and its behavioral changes are exposed as configurable mechanisms.
+No source code was copied.
+
+--------------------------------------------------------------------------------
+3. ik-rs — structural reference only
+--------------------------------------------------------------------------------
+Licensed under the GNU LGPL, version 2.1.
+Project: https://github.com/blueshen/ik-rs
+
+Consulted for a high-level structural overview only. This repository
+contains no source code from ik-rs, and the crate is not linked against
+or derived from it.
+
+--------------------------------------------------------------------------------
+4. Test corpus
+--------------------------------------------------------------------------------
+benches/corpus.txt is an excerpt of the Project Gutenberg eBook
+"灵历集光" (https://www.gutenberg.org/), which is in the public domain in
+the United States. The original Project Gutenberg header is retained.

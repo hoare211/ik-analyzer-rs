@@ -1,0 +1,35 @@
+name: 功能建议
+description: 提出新能力或改进建议
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 要解决的问题
+      description: 请描述使用场景与当前的不便，而不是直接给出实现方案
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 期望的方案
+      description: 你希望 API / 配置 / 行为如何变化？如涉及兼容性请说明
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 考虑过的替代方案
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: compatibility
+    attributes:
+      label: 兼容性影响
+      options:
+        - label: 会改变默认配置下的分词结果
+        - label: 会改变公共 API（可能 breaking）
+        - label: 仅新增能力，不影响既有行为

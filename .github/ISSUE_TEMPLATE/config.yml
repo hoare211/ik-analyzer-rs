@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 安全漏洞（私下报告）
+    url: https://github.com/hoare211/ik-analyzer-rs/security/advisories/new
+    about: 请勿通过公开 Issue 报告安全问题，详见 SECURITY.md
+  - name: 使用文档
+    url: https://github.com/hoare211/ik-analyzer-rs/blob/main/docs/使用手册.md
+    about: 安装、配置、Python 绑定与常见问题
