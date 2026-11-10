@@ -57,7 +57,7 @@ body:
       description: OS、rustc / Python 版本、feature 组合
       placeholder: |
         OS: Ubuntu 24.04
-        rustc: 1.85.0
+        rustc: 1.86.0
         features: default (judge-fast)
     validations:
       required: true

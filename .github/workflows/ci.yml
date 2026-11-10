@@ -57,11 +57,13 @@ jobs:
       - run: cargo test --no-default-features --lib
 
   msrv:
-    name: MSRV 1.85
+    name: MSRV 1.86
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.85.0
+      # 1.86 而非 1.85：dev-dependency `criterion 0.8` 的 rust-version = 1.86，
+      # `cargo test --lib` 会编译 dev-deps，1.85 下必然失败。
+      - uses: dtolnay/rust-toolchain@1.86.0
       # 评审 P4-9：补上默认 feature 与测试，避免只验证回落路径
       - run: cargo build --no-default-features
       - run: cargo build

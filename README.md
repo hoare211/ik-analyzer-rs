@@ -149,7 +149,7 @@ TokenizerFactory (加载词典一次，共享 Arc<Dictionary>)
 
 ## 兼容性 / MSRV
 
-- 需要 **Rust 1.85+**（`edition = "2024"`）。`Cargo.toml` 已声明 `rust-version = "1.85"`。
+- 需要 **Rust 1.86+**（`edition = "2024"`）。`Cargo.toml` 已声明 `rust-version = "1.86"`。
 - 默认启用 `judge-fast` feature（链模型 O(n) 裁决）。`--no-default-features` 回落到 `judge_reference`（O(n²)，与启用前行为一致，可供紧急回退或离线对拍）。
 - CLI 日志后端为 optional：`cargo run --bin ik-analyzer --features env_logger -- "..."` 才会打印词典加载报告。
 

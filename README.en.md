@@ -164,7 +164,7 @@ TokenizerFactory (loads dictionaries once, shares Arc<Dictionary>)
 
 ## Compatibility / MSRV
 
-- Requires **Rust 1.85+** (`edition = "2024"`). `Cargo.toml` declares `rust-version = "1.85"`.
+- Requires **Rust 1.86+** (`edition = "2024"`). `Cargo.toml` declares `rust-version = "1.86"`.
 - `judge-fast` is enabled by default (O(n) chain-model arbitration). `--no-default-features` falls back to `judge_reference` (O(n²), byte-identical to the pre-feature behavior, for emergency rollback or offline comparison).
 - The CLI logging backend is optional: only `cargo run --bin ik-analyzer --features env_logger -- "..."` prints the dictionary loading report.
 

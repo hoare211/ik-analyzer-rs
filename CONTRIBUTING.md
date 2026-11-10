@@ -4,7 +4,7 @@
 
 ## 开发环境
 
-- Rust **1.85+**（`edition = "2024"`；MSRV 由 `rust-version` 与 CI 的 `msrv` job 校验）
+- Rust **1.86+**（`edition = "2024"`；MSRV 由 `rust-version` 与 CI 的 `msrv` job 校验）
 - Python 3.8+ 与 [maturin](https://www.maturin.rs/)（仅在改动 Python 绑定时需要）
 - JDK 21（仅在复算 `testing/ab/` 的 Java A/B 对拍时需要）
 
